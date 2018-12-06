@@ -46,7 +46,7 @@
   
 ### Installing the Express build template  
   
-1. Create the following as `express.yaml` for the “express” build template:
+1. Create the following as `express-action.yaml` for the “express-action” build template:
 
   ```
   apiVersion: build.knative.dev/v1alpha1
@@ -62,29 +62,34 @@
       default: /workspace/Dockerfile
 
     steps:
+    - name: get-dockerfile
+      image: ubuntu
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/bash"]
+      args: ["-c", "apt-get update;apt-get install -y wget;wget https://raw.githubusercontent.com/seabaylea/expressjs-action-build/master/Dockerfile-build -O /workspace/Dockerfile-build;"]
     - name: build-and-push 
       image: gcr.io/kaniko-project/executor
       imagePullPolicy: IfNotPresent
       args:
-      - --dockerfile=/workspace/Dockerfile
+      - --dockerfile=/workspace/Dockerfile-build
       - --destination=${IMAGE}
   ```
 
 2. Install the template:
 
   ```
-  kubectl apply -f express.yaml
+  kubectl apply -f express-action.yaml
   ```
   
 ### Build and deploy your handler
 
-1. Create the following as `express-action.yaml` your applications build definition:  
+1. Create the following as `my-express-action.yaml` your applications build definition:  
 
   ```
   apiVersion: serving.knative.dev/v1alpha1
   kind: Service
   metadata:
-    name: express-action 
+    name: my-express-action 
     namespace: default
   spec:
     runLatest:
@@ -102,18 +107,18 @@
               name: express 
               arguments:
                 - name: IMAGE
-                  value: docker.io/seabaylea/express-action:latest
+                  value: docker.io/seabaylea/my-express-action:latest
         revisionTemplate:
           spec:
             container:
-              image: docker.io/seabaylea/express-action:latest
+              image: docker.io/seabaylea/my-express-action:latest
               imagePullPolicy: IfNotPresent
   ```
 
 2. Build and install your application:
 
   ```
-  kubectl apply -f express-action.yaml
+  kubectl apply -f my-express-action.yaml
   ```
   
 3. Check the deployments and make sure its listed
@@ -126,20 +131,20 @@
   
   ```
   NAME                              DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-express-action-00001-deployment   1         1         1            1           1m
+  my-express-action-00001-deployment   1         1         1            1           1m
   ```
   
 4. Get the deployed service
 
   ```
-  kubectl get service express-action
+  kubectl get service my-express-action
   ```
   
   Should respond with:
   
   ```
   NAME             TYPE           CLUSTER-IP   EXTERNAL-IP                                             PORT(S)   AGE
-express-action   ExternalName   <none>       knative-ingressgateway.istio-system.svc.cluster.local   <none>    1m
+  my-express-action   ExternalName   <none>       knative-ingressgateway.istio-system.svc.cluster.local   <none>    1m
   ```
   
 ### Testing your Handler
@@ -162,7 +167,7 @@ express-action   ExternalName   <none>       knative-ingressgateway.istio-system
 2. Access the service using cURL:
 
   ```
-  curl -v -H "Host: express-action.default.example.com" http://127.0.0.1:32380
+  curl -v -H "Host: my-express-action.default.example.com" http://127.0.0.1:32380
   ```
   
   The structure for Host is `{service-name}.{namespace}.example.com`
@@ -175,7 +180,7 @@ express-action   ExternalName   <none>       knative-ingressgateway.istio-system
   * TCP_NODELAY set
   * Connected to 127.0.0.1 (127.0.0.1) port 32380 (#0)
   > GET / HTTP/1.1
-  > Host: express-action.default.example.com
+  > Host: my-express-action.default.example.com
   > User-Agent: curl/7.61.1
   > Accept: */*
   > 
