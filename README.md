@@ -13,10 +13,10 @@
   * Move the Memory slider to at least **6.0GiB**
   * Click **Apply & Restart**
 
-2. Install Istio using **NodePort** rather than **LoadBalancer** (there is no LoadBalancer in the embedded Kubernetes in Docker for Mac):
+2. Install Istio using **NodePort** rather than **LoadBalancer** (there is no LoadBalancer in the embedded Kubernetes in Docker for Mac) and reducing the memory usage of Pilot from **2048Mi** to **512Mi**:
 
   ```
-  curl -L https://storage.googleapis.com/knative-releases/serving/latest/istio.yaml | sed 's/LoadBalancer/NodePort/' | kubectl apply -f -
+  curl -L http://storage.googleapis.com/knative-releases/serving/latest/istio.yaml | sed 's/LoadBalancer/NodePort/' | sed 's/2048/512/' | kubectl apply -f -
   ```
   
 3. Enable Istio injection:
@@ -34,7 +34,7 @@
 5. Install Knative*-Lite* with **NodePort** rather than **LoadBalancer**:
 
   ```
-  curl -L https://storage.googleapis.com/knative-releases/serving/latest/release-lite.yaml | sed 's/LoadBalancer/NodePort/' | kubectl apply -f -
+  curl -L http://storage.googleapis.com/knative-releases/serving/latest/release-lite.yaml | sed 's/LoadBalancer/NodePort/' | kubectl apply -f -
   ```
   
 6. Wait for Knative Serving and Knative Build to come up:
