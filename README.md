@@ -1,7 +1,7 @@
 ## Deploying an Express Handler to Knative
 
 * [Installing Knative (for Kubernetes in Docker for Mac)](#installing-knative)
-* [Installing the Express build template](#Installing-the-Express-build-template)
+* [Installing the Express Action build template](#Installing-the-Express-Action-build-template)
 * [Build and deploy your handler](#Build-and-deploy-your-handler)
 * [Testing your Handler](#Testing-your-Handler)
 
@@ -44,7 +44,7 @@
   kubectl get pods --namespace=knative-build
   ```
   
-### Installing the Express build template  
+### Installing the Express Action build template  
   
 1. Create the following as `express-action.yaml` for the “express-action” build template:
 
@@ -52,7 +52,7 @@
   apiVersion: build.knative.dev/v1alpha1
   kind: BuildTemplate
   metadata:
-    name: express 
+    name: express-action 
   spec:
     parameters:
     - name: IMAGE
@@ -104,7 +104,7 @@
                 url: https://github.com/seabaylea/action.git
                 revision: master
             template:
-              name: express 
+              name: express-action 
               arguments:
                 - name: IMAGE
                   value: docker.io/seabaylea/my-express-action:latest
